@@ -6,23 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('appointments', function (Blueprint $table) {
-            //
+            $table->string('vehicle')->nullable()->after('customer_phone');
+            $table->string('location_preference')->default('shop')->after('vehicle');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('appointments', function (Blueprint $table) {
-            //
+            $table->dropColumn(['vehicle', 'location_preference']);
         });
     }
 };

@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\TeamMember;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
-use function Livewire\Volt\layout;
 
-layout('components.layouts.client');
 
+#[Layout('components.layouts.client')]
 new class extends Component {
     public $members;
 
@@ -17,56 +17,51 @@ new class extends Component {
 ?>
 
 <div>
-
-    {{-- ─── Page Header ────────────────────────────────────── --}}
-    <section class="py-5 bg-dark text-white">
+    {{-- Page Header --}}
+    <div class="page-header text-white">
         <div class="container">
-            <h1 class="fw-bold mb-1">Our Team</h1>
-            <p class="text-white-50 mb-0">The skilled professionals who keep your vehicle running its best.</p>
+            <p class="text-orange mb-1 fw-bold small" style="letter-spacing:2px;font-family:'Oswald',sans-serif;">THE CREW</p>
+            <h1 class="display-5 fw-bold mb-0">OUR <span class="text-orange">TEAM</span></h1>
         </div>
-    </section>
+    </div>
 
-    {{-- ─── Team Grid ──────────────────────────────────────── --}}
-    <section class="py-5">
-        <div class="container">
+    <section class="py-5 bg-asphalt">
+        <div class="container py-3">
             @if($members->isEmpty())
-                <div class="text-center py-5 text-muted">
-                    <div style="font-size:4rem">👥</div>
-                    <p class="mt-2">Team profiles coming soon!</p>
+                <div class="text-center py-5 text-secondary">
+                    <i class="fa-solid fa-users fa-3x text-orange mb-3"></i>
+                    <p class="fs-5">Team profiles coming soon!</p>
                 </div>
             @else
                 <div class="row g-4">
                     @foreach($members as $member)
                         <div class="col-sm-6 col-lg-3">
-                            <div class="card team-card p-4 h-100">
-                                @if($member->photo)
-                                    <img src="{{ asset('storage/' . $member->photo) }}"
-                                         alt="{{ $member->name }}" class="avatar mx-auto">
-                                @else
-                                    <div class="avatar-placeholder mx-auto">
-                                        {{ strtoupper(substr($member->name, 0, 1)) }}
-                                    </div>
-                                @endif
-                                <div class="member-name">{{ $member->name }}</div>
-                                <div class="member-role">{{ $member->role }}</div>
+                            <div class="h-100 p-4 text-center border border-dark"
+                                 style="background:var(--brand-gray);transition:transform .3s,border-color .3s;"
+                                 onmouseover="this.style.transform='translateY(-6px)';this.style.borderColor='var(--brand-orange)'"
+                                 onmouseout="this.style.transform='';this.style.borderColor=''">
+                                <div class="mx-auto mb-3 d-flex align-items-center justify-content-center fw-bold"
+                                     style="width:80px;height:80px;border-radius:50%;background:var(--brand-orange);color:#fff;font-size:2rem;font-family:'Oswald',sans-serif;">
+                                    {{ strtoupper(substr($member->name, 0, 1)) }}
+                                </div>
+                                <h5 class="fw-bold text-white mb-1">{{ $member->name }}</h5>
+                                <p class="text-orange small mb-2 fw-bold" style="letter-spacing:1px;">{{ $member->role }}</p>
                                 @if($member->bio)
-                                    <p class="text-muted small mt-2 mb-0">{{ $member->bio }}</p>
+                                    <p class="text-secondary small mb-0" style="font-family:'Roboto',sans-serif;">{{ $member->bio }}</p>
                                 @endif
                             </div>
                         </div>
                     @endforeach
                 </div>
             @endif
+
+            <div class="text-center mt-5">
+                <h4 class="fw-bold text-white mb-3">JOIN THE LAB</h4>
+                <p class="text-secondary mb-4" style="font-family:'Roboto',sans-serif;">
+                    We're always looking for passionate automotive professionals to join the 1625 AutoLab family.
+                </p>
+                <a href="mailto:careers@1625autolab.com" class="btn btn-orange px-5 py-3">Apply Now</a>
+            </div>
         </div>
     </section>
-
-    {{-- ─── Join CTA ───────────────────────────────────────── --}}
-    <section class="py-5 bg-light">
-        <div class="container text-center">
-            <h3 class="fw-bold mb-2">Join Our Team</h3>
-            <p class="text-muted mb-3">We're always looking for passionate automotive professionals to join the 1625 AutoLab family.</p>
-            <a href="mailto:careers@1625autolab.com" class="btn btn-danger px-4">Apply Now</a>
-        </div>
-    </section>
-
 </div>

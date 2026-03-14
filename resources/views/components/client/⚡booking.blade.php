@@ -3,11 +3,11 @@
 use App\Models\Appointment;
 use App\Models\Service;
 use Livewire\Attributes\Validate;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
-use function Livewire\Volt\layout;
 
-layout('components.layouts.client');
 
+#[Layout('components.layouts.client')]
 new class extends Component {
     public $services;
     public bool $submitted = false;

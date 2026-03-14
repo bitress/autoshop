@@ -2,13 +2,11 @@
 
 use App\Models\Service;
 use Livewire\Attributes\Validate;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
-use function Livewire\Volt\layout;
-use function Livewire\Volt\title;
 
-layout('components.layouts.admin');
-title('Services – Admin');
 
+#[Layout('components.layouts.admin')]
 new class extends Component {
     public $services;
     public bool   $showForm = false;

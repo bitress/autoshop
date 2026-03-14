@@ -11,6 +11,8 @@ class Appointment extends Model
         'customer_name',
         'customer_email',
         'customer_phone',
+        'vehicle',
+        'location_preference',
         'service_id',
         'appointment_date',
         'appointment_time',

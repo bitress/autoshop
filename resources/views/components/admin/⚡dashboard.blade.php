@@ -3,13 +3,11 @@
 use App\Models\Appointment;
 use App\Models\Service;
 use App\Models\TeamMember;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
-use function Livewire\Volt\layout;
-use function Livewire\Volt\title;
 
-layout('components.layouts.admin');
-title('Dashboard – Admin');
 
+#[Layout('components.layouts.admin')]
 new class extends Component {
     public int $totalAppointments;
     public int $pendingAppointments;

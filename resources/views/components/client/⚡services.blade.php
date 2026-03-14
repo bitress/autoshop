@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\Service;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
-use function Livewire\Volt\layout;
 
-layout('components.layouts.client');
 
+#[Layout('components.layouts.client')]
 new class extends Component {
     public $services;
 

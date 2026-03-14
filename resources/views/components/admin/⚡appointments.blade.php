@@ -1,14 +1,12 @@
 <?php
 
 use App\Models\Appointment;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
-use function Livewire\Volt\layout;
-use function Livewire\Volt\title;
 
-layout('components.layouts.admin');
-title('Appointments – Admin');
 
+#[Layout('components.layouts.admin')]
 new class extends Component {
     use WithPagination;
 

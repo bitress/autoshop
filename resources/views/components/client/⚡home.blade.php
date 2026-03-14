@@ -1,192 +1,381 @@
 <?php
 
+use App\Models\Appointment;
 use App\Models\Service;
-use App\Models\TeamMember;
+use Livewire\Attributes\Validate;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
-use function Livewire\Volt\layout;
 
-layout('components.layouts.client');
 
+#[Layout('components.layouts.shell')]
 new class extends Component {
-    public $featuredServices;
-    public $teamMembers;
+    public bool $submitted = false;
 
-    public function mount(): void
+    #[Validate('required|string|max:100')]
+    public string $customer_name = '';
+
+    #[Validate('required|email|max:150')]
+    public string $customer_email = '';
+
+    #[Validate('required|string|max:30')]
+    public string $customer_phone = '';
+
+    #[Validate('nullable|string|max:150')]
+    public string $vehicle = '';
+
+    #[Validate('required|string|max:100')]
+    public string $service_type = 'Headlight Retrofit';
+
+    #[Validate('required|string|max:80')]
+    public string $location_preference = 'Shop Service (San Fernando, Pampanga)';
+
+    #[Validate('nullable|string|max:600')]
+    public string $notes = '';
+
+    public function submit(): void
     {
-        $this->featuredServices = Service::active()->take(6)->get();
-        $this->teamMembers      = TeamMember::active()->take(4)->get();
+        $this->validate();
+
+        Appointment::create([
+            'customer_name'       => $this->customer_name,
+            'customer_email'      => $this->customer_email,
+            'customer_phone'      => $this->customer_phone,
+            'vehicle'             => $this->vehicle ?: null,
+            'location_preference' => $this->location_preference,
+            'appointment_date'    => now()->addDay()->format('Y-m-d'),
+            'appointment_time'    => '09:00',
+            'notes'               => trim("Service: {$this->service_type}\n{$this->notes}"),
+            'status'              => 'pending',
+        ]);
+
+        $this->submitted = true;
+        $this->reset(['customer_name','customer_email','customer_phone',
+                       'vehicle','notes']);
     }
 };
 ?>
 
 <div>
 
-    {{-- ─── Hero ──────────────────────────────────────────── --}}
-    <section class="hero-section">
-        <div class="container position-relative">
-            <div class="row align-items-center gy-4">
-                <div class="col-lg-7">
-                    <p class="text-accent fw-semibold mb-2 text-uppercase small">Professional Auto Care</p>
-                    <h1 class="hero-title mb-3">
-                        Your Car Deserves<br>
-                        <span>Expert Hands.</span>
-                    </h1>
-                    <p class="hero-subtitle mb-4">
-                        1625 AutoLab delivers honest, high-quality automotive service.
-                        From oil changes to full engine diagnostics — we keep you on the road.
-                    </p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="{{ route('client.booking') }}" class="btn btn-hero-primary">
-                            📅 Book Appointment
-                        </a>
-                        <a href="{{ route('client.services') }}" class="btn btn-hero-secondary">
-                            View Services
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-5 text-center d-none d-lg-block">
-                    <div style="font-size:9rem;line-height:1;opacity:.18;">🚗</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ─── Stats Bar ──────────────────────────────────────── --}}
-    <section class="stats-bar">
+    {{-- ============================================================
+         NAVBAR
+    ============================================================ --}}
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top" id="navbarNav">
         <div class="container">
-            <div class="row text-center gy-3">
-                <div class="col-6 col-md-3">
-                    <div class="stat-number">10+</div>
-                    <div class="stat-label">Years Experience</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-number">5K+</div>
-                    <div class="stat-label">Happy Customers</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-number">ASE</div>
-                    <div class="stat-label">Certified Techs</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="stat-number">6</div>
-                    <div class="stat-label">Days a Week</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- ─── Services Preview ───────────────────────────────── --}}
-    <section class="py-5">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
-                <div>
-                    <h2 class="section-title mb-1">Our Services</h2>
-                    <p class="text-muted">Quality work at fair prices — no surprises.</p>
-                </div>
-                <a href="{{ route('client.services') }}" class="btn btn-outline-danger btn-sm">
-                    View All Services →
-                </a>
-            </div>
-
-            @if($featuredServices->isEmpty())
-                <div class="text-center py-5 text-muted">
-                    <div style="font-size:4rem">🔧</div>
-                    <p class="mt-2">Services coming soon. Check back shortly!</p>
-                </div>
-            @else
-                <div class="row g-4">
-                    @foreach($featuredServices as $service)
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card service-card p-4">
-                                <div class="card-icon">{{ $service->icon }}</div>
-                                <h5 class="card-title">{{ $service->name }}</h5>
-                                <p class="text-muted small flex-grow-1">{{ $service->description }}</p>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    @if($service->price)
-                                        <span class="badge-price">{{ $service->price }}</span>
-                                    @endif
-                                    @if($service->duration)
-                                        <small class="text-muted">⏱ {{ $service->duration }}</small>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    </section>
-
-    {{-- ─── Booking CTA ────────────────────────────────────── --}}
-    <section class="py-5 bg-dark text-white">
-        <div class="container text-center">
-            <h2 class="fw-bold mb-2">Ready to Schedule Your Visit?</h2>
-            <p class="text-white-50 mb-4">Book your appointment online — quick, easy, and no phone calls needed.</p>
-            <a href="{{ route('client.booking') }}" class="btn btn-hero-primary btn-lg px-5">
-                📅 Book Appointment Now
+            <a class="navbar-brand fw-bold" href="#">
+                1625 <span class="text-orange">AUTOLAB</span>
             </a>
-        </div>
-    </section>
-
-    {{-- ─── Team Preview ───────────────────────────────────── --}}
-    @if($teamMembers->isNotEmpty())
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="text-center mb-4">
-                <h2 class="section-title text-center">Meet the Team</h2>
-                <p class="text-muted">Skilled professionals who take pride in their work.</p>
+            <button class="navbar-toggler border-0 shadow-none" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNavCollapse">
+                <i class="fa-solid fa-bars text-orange fs-2"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavCollapse">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#services">The Lab</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#promo">Promos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#work">Recent Builds</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('client.team') }}">Team</a></li>
+                    <li class="nav-item ms-lg-4 mt-3 mt-lg-0">
+                        <a class="btn btn-orange px-4 py-2" href="#booking">Book A Bay</a>
+                    </li>
+                </ul>
             </div>
-            <div class="row g-4 justify-content-center">
-                @foreach($teamMembers as $member)
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="card team-card p-4">
-                            <div class="avatar-placeholder mx-auto">
-                                {{ strtoupper(substr($member->name, 0, 1)) }}
-                            </div>
-                            <div class="member-name">{{ $member->name }}</div>
-                            <div class="member-role">{{ $member->role }}</div>
-                            @if($member->bio)
-                                <p class="text-muted small mt-2 mb-0">{{ $member->bio }}</p>
-                            @endif
-                        </div>
+        </div>
+    </nav>
+
+    {{-- ============================================================
+         HERO
+    ============================================================ --}}
+    <section class="hero bg-asphalt">
+        <div class="container text-center text-md-start mt-5">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <div class="d-inline-block px-3 py-1 mb-3 border border-orange text-orange"
+                         style="background:rgba(234,88,12,.1);font-family:'Oswald';letter-spacing:2px;font-size:.85rem;">
+                        PAMPANGA'S PREMIER RETROFITTERS
                     </div>
-                @endforeach
-            </div>
-            <div class="text-center mt-4">
-                <a href="{{ route('client.team') }}" class="btn btn-outline-danger btn-sm">
-                    Meet the Full Team →
-                </a>
-            </div>
-        </div>
-    </section>
-    @endif
-
-    {{-- ─── Facebook Feed ──────────────────────────────────── --}}
-    <section class="py-5 facebook-feed-section">
-        <div class="container">
-            <div class="text-center mb-4">
-                <h2 class="section-title text-center">Follow Us on Facebook</h2>
-                <p class="text-muted">Stay up to date with our latest offers and updates.</p>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <div class="fb-feed-placeholder p-5 text-center">
-                        <div class="fb-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#1877f2" viewBox="0 0 16 16">
-                                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"/>
-                            </svg>
-                        </div>
-                        <h5 class="mt-3 fw-bold text-dark">1625 AutoLab</h5>
-                        <p class="text-muted small mb-3">Follow our Facebook page for promotions, tips, and updates!</p>
-                        <a href="https://www.facebook.com/1625autolab"
-                           target="_blank" rel="noopener noreferrer"
-                           class="btn btn-primary">
-                            Visit Facebook Page
-                        </a>
+                    <h1 class="display-2 fw-bold mb-4">
+                        FRUSTRATED WITH <br><span class="text-orange">OUTDATED</span> TECH?
+                    </h1>
+                    <p class="lead text-light mb-5 fs-4" style="max-width:600px;font-family:'Roboto',sans-serif;">
+                        Precision Headlight Retrofits &amp; Android Headunit Installations.
+                        Clean wiring. Factory fit finish. Zero guesswork.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3">
+                        <a href="#booking" class="btn btn-orange btn-lg px-5 py-3">Schedule Upgrade</a>
+                        <a href="#services" class="btn btn-outline-steel btn-lg px-5 py-3">View Services</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    {{-- ============================================================
+         SERVICES
+    ============================================================ --}}
+    <section id="services" class="py-5 bg-asphalt">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3">SERVICES OFFERED</h2>
+                <div class="section-title-line mx-auto"></div>
+            </div>
+
+            <div class="row g-5 justify-content-center">
+                <div class="col-lg-5 col-md-6">
+                    <div class="service-card p-5">
+                        <div class="mb-4 d-flex align-items-center gap-3 border-bottom border-dark pb-3">
+                            <i class="fa-solid fa-eye fs-1 text-orange"></i>
+                            <h3 class="fw-bold m-0">Headlights Retrofit</h3>
+                        </div>
+                        <ul>
+                            <li><i class="fa-solid fa-bolt"></i> Headlights &amp; Foglights Upgrade</li>
+                            <li><i class="fa-solid fa-bolt"></i> Angel &amp; Demon Eyes Installation</li>
+                            <li><i class="fa-solid fa-bolt"></i> DRL Installation &amp; Replacement</li>
+                            <li><i class="fa-solid fa-bolt"></i> Precision Laser Alignment</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-5 col-md-6">
+                    <div class="service-card p-5">
+                        <div class="mb-4 d-flex align-items-center gap-3 border-bottom border-dark pb-3">
+                            <i class="fa-solid fa-display fs-1 text-orange"></i>
+                            <h3 class="fw-bold m-0">Android Headunit</h3>
+                        </div>
+                        <ul>
+                            <li><i class="fa-solid fa-microchip"></i> Wireless Carplay &amp; Android Auto</li>
+                            <li><i class="fa-solid fa-microchip"></i> 360 Camera Integration</li>
+                            <li><i class="fa-solid fa-microchip"></i> Perfect Fitting OEM-style Frame</li>
+                            <li><i class="fa-solid fa-microchip"></i> Powerful Octacore Processing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================================================
+         PROMO
+    ============================================================ --}}
+    <section id="promo" class="py-5" style="background-color:#050505;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="promo-banner p-5 text-center">
+                        <h2 class="display-4 fw-bold text-white mb-3">
+                            FREE <span class="text-orange">DEMON EYES!</span>
+                        </h2>
+                        <p class="fs-4 text-light mb-4" style="font-family:'Roboto',sans-serif;">
+                            Get FREE Demon Eyes (Purple, Amber, Blue, Ice Blue, or White) with every Headlight Retrofit package.
+                        </p>
+                        <a href="#booking" class="btn btn-orange btn-lg px-5">Claim Offer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================================================
+         RECENT BUILDS
+    ============================================================ --}}
+    <section id="work" class="py-5 bg-asphalt">
+        <div class="container py-5">
+            <div class="d-flex justify-content-between align-items-end mb-5 border-bottom border-dark pb-3">
+                <div>
+                    <h2 class="fw-bold m-0 display-6">LATEST <span class="text-orange">BUILDS</span></h2>
+                    <div class="section-title-line mt-3"></div>
+                </div>
+                <a href="https://www.facebook.com/1625autolab" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-outline-steel d-none d-md-block">
+                    <i class="fa-brands fa-facebook me-2"></i>Follow 1625
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600705591462-80ba4e851d7e?q=80&w=600&auto=format&fit=crop"
+                             class="build-img" alt="Headlight retrofit">
+                    </div>
+                    <p class="build-caption">&gt; Ice Blue Demon Eyes. Clean cutoff. 💯</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1544829728-e5cb9eedc20e?q=80&w=600&auto=format&fit=crop"
+                             class="build-img" alt="Android headunit">
+                    </div>
+                    <p class="build-caption">&gt; Android Headunit fitted. Wireless Carplay active. 🚀</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=600&auto=format&fit=crop"
+                             class="build-img" alt="Car delivery">
+                    </div>
+                    <p class="build-caption">&gt; DRL and Foglights aligned. Ready for delivery. 🔧</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================================================
+         BOOKING (Livewire powered)
+    ============================================================ --}}
+    <section id="booking" class="py-5 bg-dark">
+        <div class="container py-5">
+            <div class="row g-5">
+
+                {{-- Contact info --}}
+                <div class="col-lg-5">
+                    <h2 class="display-5 fw-bold mb-4">VISIT THE <span class="text-orange">LAB</span></h2>
+                    <ul class="list-unstyled fs-5 text-light mb-5" style="font-family:'Roboto',sans-serif;">
+                        <li class="mb-4 d-flex align-items-start">
+                            <i class="fa-solid fa-location-dot text-orange mt-1 me-3 fs-4"></i>
+                            <div>
+                                <strong>NKKS Arcade</strong><br>
+                                <span class="text-secondary fs-6">Brgy. Alasas, San Fernando Pampanga</span><br>
+                                <span class="text-orange fs-6"><i class="fa-brands fa-waze me-1"></i> Waze: 1625 Autolab</span>
+                            </div>
+                        </li>
+                        <li class="mb-2"><i class="fa-solid fa-phone text-orange me-3"></i> <span class="text-secondary">0991 940 7307</span></li>
+                        <li class="mb-2"><i class="fa-solid fa-phone text-orange me-3"></i> <span class="text-secondary">0995 258 1474</span></li>
+                        <li class="mb-2"><i class="fa-solid fa-phone text-orange me-3"></i> <span class="text-secondary">0956 450 0292</span></li>
+                    </ul>
+
+                    <div class="p-4 border border-secondary" style="background:var(--brand-gray);">
+                        <h4 class="text-orange mb-3"><i class="fa-solid fa-truck-fast me-2"></i>Home Service</h4>
+                        <p class="m-0 text-secondary fs-6" style="font-family:'Roboto',sans-serif;">
+                            Can't make it to Pampanga? Ask about our "Visiting the South" schedule for home installations.
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="https://www.facebook.com/1625autolab" target="_blank" rel="noopener noreferrer"
+                           class="btn btn-outline-steel w-100 py-3">
+                            <i class="fa-brands fa-facebook me-2"></i>Message Us on Facebook
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Booking form --}}
+                <div class="col-lg-7">
+                    <div class="p-4 p-md-5 border border-secondary" style="background:var(--brand-gray);">
+
+                        @if($submitted)
+                            <div class="text-center py-4">
+                                <i class="fa-solid fa-circle-check text-orange" style="font-size:3.5rem;"></i>
+                                <h3 class="fw-bold mt-3 mb-2">BUILD REQUEST RECEIVED!</h3>
+                                <p class="text-secondary mb-4" style="font-family:'Roboto',sans-serif;">
+                                    We've logged your request. Our team will reach out via your contact details to confirm your slot.
+                                </p>
+                                <button class="btn btn-outline-steel px-4" wire:click="$set('submitted', false)">
+                                    Submit Another Request
+                                </button>
+                            </div>
+                        @else
+                            <h3 class="fw-bold mb-4">SYSTEM INTAKE FORM</h3>
+
+                            <form wire:submit="submit" novalidate>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Full Name <span class="text-orange">*</span></label>
+                                        <input type="text" class="form-control @error('customer_name') is-invalid @enderror"
+                                               wire:model="customer_name" placeholder="Juan Dela Cruz">
+                                        @error('customer_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Contact Number <span class="text-orange">*</span></label>
+                                        <input type="tel" class="form-control @error('customer_phone') is-invalid @enderror"
+                                               wire:model="customer_phone" placeholder="09XX XXX XXXX">
+                                        @error('customer_phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email Address <span class="text-orange">*</span></label>
+                                        <input type="email" class="form-control @error('customer_email') is-invalid @enderror"
+                                               wire:model="customer_email" placeholder="you@email.com">
+                                        @error('customer_email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Vehicle Make / Model / Year</label>
+                                        <input type="text" class="form-control @error('vehicle') is-invalid @enderror"
+                                               wire:model="vehicle" placeholder="e.g. Toyota Fortuner 2020">
+                                        @error('vehicle')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Service Required <span class="text-orange">*</span></label>
+                                        <select class="form-select @error('service_type') is-invalid @enderror"
+                                                wire:model="service_type">
+                                            <option>Headlight Retrofit</option>
+                                            <option>Android Headunit Installation</option>
+                                            <option>Both (Retrofit + Headunit)</option>
+                                            <option>Other / Inquiry</option>
+                                        </select>
+                                        @error('service_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Location Preference <span class="text-orange">*</span></label>
+                                        <select class="form-select @error('location_preference') is-invalid @enderror"
+                                                wire:model="location_preference">
+                                            <option>Shop Service (San Fernando, Pampanga)</option>
+                                            <option>Home Service (Subject to availability)</option>
+                                        </select>
+                                        @error('location_preference')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label">Specific Requests</label>
+                                    <textarea class="form-control @error('notes') is-invalid @enderror"
+                                              wire:model="notes" rows="4"
+                                              placeholder="Let us know what Demon Eye color you want, or specific headunit specs..."></textarea>
+                                    @error('notes')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+
+                                <button type="submit" class="btn btn-orange w-100 py-3 fs-5"
+                                        wire:loading.attr="disabled">
+                                    <span wire:loading.remove>SUBMIT BUILD REQUEST</span>
+                                    <span wire:loading>
+                                        <i class="fa-solid fa-spinner fa-spin me-1"></i> Processing…
+                                    </span>
+                                </button>
+                            </form>
+                        @endif
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================================================
+         FOOTER
+    ============================================================ --}}
+    <footer class="site-footer py-4 text-center">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <p class="mb-0 fw-bold text-uppercase" style="letter-spacing:1px;">&copy; {{ date('Y') }} 1625 Auto Lab.</p>
+            <p class="mb-0 font-monospace fs-6 mt-2 mt-md-0">
+                System architected by <a href="https://byteress.xyz" target="_blank" rel="noopener noreferrer">Bitressium</a>
+            </p>
+        </div>
+    </footer>
+
+    {{-- Active nav on scroll --}}
+    <script>
+    document.addEventListener('livewire:init', () => {
+        const navLinks = document.querySelectorAll('#navbarNavCollapse .nav-link');
+        const sections = document.querySelectorAll('section[id]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(s => { if (window.pageYOffset >= s.offsetTop - 120) current = s.id; });
+            navLinks.forEach(l => {
+                l.classList.remove('active');
+                if (l.getAttribute('href') && l.getAttribute('href') === '#' + current) l.classList.add('active');
+            });
+        });
+    });
+    </script>
 
 </div>
