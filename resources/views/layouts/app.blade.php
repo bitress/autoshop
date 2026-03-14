@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? config('app.name', '1625 AutoLab') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @livewireStyles
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>1625 Auto Lab | Retrofit & Headunit Specialists</title>
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 </head>
 <body>
-    {{ $slot }}
-    @livewireScripts
+    <div id="app"></div>
 </body>
 </html>
