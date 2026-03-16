@@ -7,8 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 
-#[Layout('components.layouts.admin')]
-new class extends Component {
+new #[Layout('components.layouts.admin')] class extends Component {
     public int $totalAppointments;
     public int $pendingAppointments;
     public int $totalServices;

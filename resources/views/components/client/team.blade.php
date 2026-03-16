@@ -5,8 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 
-#[Layout('components.layouts.client')]
-new class extends Component {
+new #[Layout('components.layouts.client')] class extends Component {
     public $members;
 
     public function mount(): void

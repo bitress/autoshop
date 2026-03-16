@@ -6,8 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 
-#[Layout('components.layouts.admin')]
-new class extends Component {
+new #[Layout('components.layouts.admin')] class extends Component {
     use WithPagination;
 
     public string $search  = '';
@@ -46,7 +45,7 @@ new class extends Component {
             ->latest()
             ->paginate(15);
 
-        return view(self::class->getName(), compact('appointments'));
+        return $this->view(compact('appointments'));
     }
 };
 ?>

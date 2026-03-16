@@ -1,16 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
-// ── Admin routes (Livewire) ───────────────────────────────────
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::livewire('/',             'admin.dashboard')->name('dashboard');
-    Route::livewire('/appointments', 'admin.appointments')->name('appointments');
-    Route::livewire('/services',     'admin.services')->name('services');
-    Route::livewire('/team',         'admin.team')->name('team');
+// ── Client routes (Livewire Volt) ─────────────────────────────
+Route::name('client.')->group(function () {
+    Volt::route('/',         'client.home')->name('home');
+    Volt::route('/services', 'client.services')->name('services');
+    Volt::route('/team',     'client.team')->name('team');
+    Volt::route('/booking',  'client.booking')->name('booking');
 });
 
-// ── React SPA catch-all ───────────────────────────────────────
-Route::get('/{any?}', function () {
-    return view('layouts.app');
-})->where('any', '.*')->name('spa');
+// ── Admin routes (Livewire Volt) ──────────────────────────────
+Route::prefix('admin')->name('admin.')->group(function () {
+    Volt::route('/',             'admin.dashboard')->name('dashboard');
+    Volt::route('/appointments', 'admin.appointments')->name('appointments');
+    Volt::route('/services',     'admin.services')->name('services');
+    Volt::route('/team',         'admin.team')->name('team');
+});

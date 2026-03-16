@@ -7,8 +7,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 
-#[Layout('components.layouts.shell')]
-new class extends Component {
+new #[Layout('components.layouts.shell')] class extends Component {
     public bool $submitted = false;
 
     #[Validate('required|string|max:100')]
