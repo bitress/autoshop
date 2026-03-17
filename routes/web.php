@@ -1,20 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
 
-// ── Client routes (Livewire Volt) ─────────────────────────────
+// ── Client routes ─────────────────────────────────────────────
 Route::name('client.')->group(function () {
-    Volt::route('/',         'client.home')->name('home');
-    Volt::route('/services', 'client.services')->name('services');
-    Volt::route('/team',     'client.team')->name('team');
-    Volt::route('/booking',  'client.booking')->name('booking');
+    Route::livewire('/',         'client.home')->name('home');
+    Route::livewire('/services', 'client.services')->name('services');
+    Route::livewire('/team',     'client.team')->name('team');
+    Route::livewire('/booking',  'client.booking')->name('booking');
 });
 
-// ── Admin routes (Livewire Volt) ──────────────────────────────
+// ── Admin routes ──────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
-    Volt::route('/',             'admin.dashboard')->name('dashboard');
-    Volt::route('/appointments', 'admin.appointments')->name('appointments');
-    Volt::route('/services',     'admin.services')->name('services');
-    Volt::route('/team',         'admin.team')->name('team');
+    Route::livewire('/',             'admin.dashboard')->name('dashboard');
+    Route::livewire('/appointments', 'admin.appointments')->name('appointments');
+    Route::livewire('/services',     'admin.services')->name('services');
+    Route::livewire('/team',         'admin.team')->name('team');
 });
