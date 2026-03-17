@@ -6,8 +6,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 
-#[Layout('components.layouts.admin')]
-new class extends Component {
+new #[Layout('components.layouts.admin')] class extends Component {
     public $members;
     public bool   $showForm = false;
     public ?int   $editId   = null;
